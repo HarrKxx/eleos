@@ -20,7 +20,7 @@ You can compile yourself or get the file here : https://github.com/HarrKxx/eleos
 
 Get the source
 ```
-git clone https://github.com/zencashio/eleos.git eleos
+git clone https://github.com/HarrKxx/eleos eleos
 ```
 cd ~/Builds/eleos
 ```
