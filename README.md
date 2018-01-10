@@ -56,10 +56,17 @@ ZCL : t1LYLVqpy9eHwA5zaC3EoQnAsNwFAYDs35p
 
 
 ### Todos
-
- - Display shielded tx generation status
- - Write MOAR tests
- - Write MOAR documentation
+- Import private key
+- Import Wallet
+- Choose fee
+- Sign application & installer
+- Refresh amount in tab after sending (need to wait confirmation ...)
+- Throw error incorrect transaction
+- Build for MacOs before Sierra
+- Re-add Send Transparent
+- Correct incompatibility with zcash
+- Show all adress
+- Write more documentation
 
 ### Help!
   - Slack:  get a login at https://discord.gg/SWzCnVD
