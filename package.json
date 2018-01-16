@@ -13,29 +13,31 @@
   "license": "CPAL-1.0",
   "devDependencies": {
     "electron": "^1.7.8",
-    "electron-installer-dmg": "^0.1.2",
+    "electron-installer-dmg": "*",
     "electron-packager": "^8.1.0",
-    "electron-winstaller": "^2.4.1",
-	"electron-installer-dmg": "*"
+    "electron-winstaller": "^2.4.1"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/HarrKxx/eleos.git"
   },
   "scripts": {
-	"start": "electron .",
+    "start": "electron .",
     "package-win": "electron-packager . eleos-for-zclassic --overwrite --platform=win32 --arch=x64 --icon=assets/icons/zcl.ico --prune=true --out=release-builds --version-string.CompanyName=HK --version-string.FileDescription=HK --version-string.ProductName=\"Eleos for Zclassic\"",
-	"package-mac": "electron-packager ./ zclassic --overwrite --platform=darwin --arch=x64 --prune=true --out=release-builds",
-	"create-installer-mac": "electron-installer-dmg ./release-builds/zclassic-darwin-x64/zclassic.app zclassic --out=release-builds --overwrite"
+    "package-mac": "electron-packager ./ zclassic --overwrite --platform=darwin --arch=x64 --prune=true --out=release-builds",
+    "create-installer-mac": "electron-installer-dmg ./release-builds/zclassic-darwin-x64/zclassic.app zclassic --out=release-builds --overwrite"
   },
   "dependencies": {
     "binding": "^3.0.3",
     "dat": "^13.7.0",
+    "electron-context-menu": "*",
     "errors": "^0.3.0",
     "express": "^4.15.3",
     "express-ws": "^3.0.0",
     "ht-auth": "^0.1.0",
     "http-auth": "^3.2.3",
+    "jquery": "^3.2.1",
+    "jsdom": "^11.5.1",
     "minimatch": "^3.0.4",
     "node-gyp": "^3.6.2",
     "node-pty": "^0.6.10",
@@ -46,7 +48,6 @@
     "tar-fs": "^1.15.3",
     "tcp-port-used": "^0.1.2",
     "typescript": "^2.4.1",
-    "xterm": "^2.8.1",
-    "electron-context-menu": "*"
+    "xterm": "^2.8.1"
   }
 }

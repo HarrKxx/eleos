@@ -18,6 +18,7 @@ const crypto = require("crypto");
 const request = require("request");
 const progress = require("request-progress");
 
+
 require('electron-context-menu')({
 	prepend: (params, browserWindow) => [{
 		label: 'Rainbow',
@@ -301,6 +302,7 @@ function createWindow() {
         return;
     }
     wallet = require("./wallet.js");
+	
 	const template = [
         {
             label: "File",
@@ -405,10 +407,10 @@ function createWindow() {
     Menu.setApplicationMenu(menu);
 	
     mainWindow = new BrowserWindow({
-        "minWidth": 1040,
-        "minHeight": 680,
-        "width": 1040,
-        "height": 680,
+        "minWidth": 1200,
+        "minHeight": 750,
+        "width": 1200,
+        "height": 750,
     });
 	
     mainWindow.loadURL(url.format({

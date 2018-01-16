@@ -4,114 +4,227 @@
 		<meta charset="UTF-8">
 		<title>Eleos for Zclassic - Equihash Wallet and Messaging</title>
 		<link rel="stylesheet" href="assets/css/main.css" />
+		    <!-- Bootstrap core CSS     -->
+    <link href="assets/css/bootstrap.min.css" rel="stylesheet" />
+    <!--  Material Dashboard CSS    -->
+    <link href="assets/css/material-dashboard.css?v=1.2.0" rel="stylesheet" />
+    <!--     Fonts and icons     -->
+    <link href="assets/css/font-awesome.min.css" rel="stylesheet">
+    <link href='http://fonts.googleapis.com/css?family=Roboto:400,700,300|Material+Icons' rel='stylesheet' type='text/css'>
+	<link rel="stylesheet" type="text/css" href="assets/css/datatables.min.css"/> 
+
 	</head>
 	<body>
-		<!-- Sidebar -->
-		<section id="sidebar">
-			<div class="inner">
-				<nav>
-					<ul>
-						<li class="active"><a class="navLink" id="welcomeTab" href="javascript:void(0)" onclick="setActiveNav(this); openPage('welcomePage')">Welcome</a></li>
-						<li><a class="navLink" id="historyTab" href="javascript:void(0)" onclick="setActiveNav(this); openPage('historyPage')">History</a></li>
-						<li><a class="navLink" id="memoTab" href="javascript:void(0)" onclick="setActiveNav(this); openPage('memoPage')">Memos</a></li>
-						<li><a class="navLink" id="sendPTab" href="javascript:void(0)" onclick="setActiveNav(this); openPage('sendPrivatePage')">Send</a></li>
-						<li><a class="navLink" id="receivePTab" href="javascript:void(0)" onclick="setActiveNav(this); openPage('receivePage')">Receive</a></li>
-						<li><a class="navLink" id="addressesTab" href="javascript:void(0)" onclick="setActiveNav(this); openPage('addressesPage')">Addresses</a></li>
-					</ul>
-				</nav>
-			</div>
-		</section>
-		<!-- Wrapper -->
-		<div id="wrapper">
-			<!-- Intro -->
-			<section id="welcomePage" class="wrapper" style="display:flex;">
-				<div class="inner">
-					<h1><img src="assets/css/images/logo-dark.png"/></h1>
-					<p>Zclassic is financial freedom.</p>
-					<ul class="actions">
-						<li><a href="http://zclassic.org/" onclick="launchZclassicOrg()" class="button">Learn more</a></li>
-					</ul>
-					<span id="alertSpan" class="alertSpan">Initializing, please wait...</span>
-				</div>
-			</section>
-			<section id="historyPage" class="wrapper">
-				<div class="inner">
-					<span id="transactionTransparentSpan"></span>
-                    <span id="transactionPrivateSpan"></span>
-				</div>
-			</section>
-			<section id="memoPage" class="wrapper">
-				<div class="inner" id="memoPageinner"></div>
-			</section>
-			<section id="sendPrivatePage" class="wrapper">
-				<div class="inner">
-					<form class="w3-container w3-margin-top w3-medium">
-                        <div class="w3-container">
-                            <label id="privateFromField">From</label><select class="w3-select w3-round w3-small" id="privateFromSelect" title="privateFromSelect"></select>
-                            <label id="privateSendToField">Send To</label><input class="w3-input w3-round" type="text" id="privateSendToValue" title="privateSendToValue"/>
-                            <label id="privateAmountField">Amount <span>(Fee 0.0001)</span></label><input class="w3-input w3-round" type="number" id="privateAmountValue" title="privateAmountValue"/>
-                            <label id="privateMemoField">Encrypted Memo <span>(optionnal)</span></label><input class="w3-input w3-round" type="text" id="privateMemoValue" title="privateMemoValue"/>
+   <div class="wrapper">
+        <div class="sidebar" data-color="orange" data-image="../assets/img/sidebar-1.jpg">
+            <!--
+        Tip 1: You can change the color of the sidebar using: data-color="purple | blue | green | orange | red"
+
+        Tip 2: you can also add an image using data-image tag
+    -->
+            <div class="logo">
+                <a href="http://zclassic.org/" onclick="launchZclassicOrg()" class="simple-text">
+                    <img src="assets/icons/zcl.png"/>&nbsp;ZClassic
+                </a>
+            </div>
+            <div class="sidebar-wrapper">
+                <ul class="nav">
+                    <li class="active">
+                        <a class="navLink" id="dashboardTab" href="javascript:void(0)" onclick="setActiveNav(this); openPage('dashboardPage')">
+                            <i class="material-icons">dashboard</i>
+                            <p>Dashboard</p>
+                        </a>
+                    </li>
+					<li>
+                        <a class="navLink" id="addressesTab" href="javascript:void(0)" onclick="setActiveNav(this); openPage('addressesPage')">
+                            <i class="material-icons">location_on</i>
+                            <p>Addresses</p>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="navLink" id="sendPTab" href="javascript:void(0)" onclick="setActiveNav(this); openPage('sendPrivatePage')">
+                            <i class="material-icons">compare_arrows</i>
+                            <p>Send</p>
+                        </a>
+                    </li>
+
+					                    <li>
+                        <a class="navLink" id="memoTab" href="javascript:void(0)" onclick="setActiveNav(this); openPage('memoPage')">
+                            <i class="material-icons">content_paste</i>
+                            <p>Memos</p>
+                        </a>
+                    </li>
+                </ul>
+									<span id="alertSpan" class="alertSpan">Initializing, please wait...</span>
+
+            </div>
+        </div>
+        <div class="main-panel">
+            <div class="content">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-lg-4 col-md-4 col-sm-4">
+                            <div class="card card-stats">
+                                <div class="card-header" data-background-color="orange">
+                                    <i class="fa fa-tachometer"></i>
+                                </div>
+                                <div class="card-content">
+                                    <p class="category">Coin Balance</p>
+                                    <h3 class="title"><span id="currentBalanceValue">0</span> 
+                                        <small><span class="coin">ZCL</span></small>
+                                    </h3>
+                                </div>
+                                <div class="card-footer">
+                                    <div class="stats">
+                                        <p><i class="fa fa-unlock-alt text-danger"></i> Transparent:<span id="transparentBalanceValue">0</span> <span class="coin">ZCL</span></p><p><i class="fa fa-shield text-danger"></i> Private:<span id="privateBalanceValue">0</span> <span class="coin">ZCL</span></p>
+
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="w3-container w3-center w3-margin-top">
-                            <button type="button" id="privateSendButton" onclick="sendPrivateTransaction()">Send</button>
-                            <button type="button" id="privateResetButton" onclick="privateReset()">Reset</button>
+                        <div class="col-lg-4 col-md-4 col-sm-4">
+                            <div class="card card-stats">
+                                <div class="card-header" data-background-color="green">
+                                    <i class="fa fa-money"></i>
+                                </div>
+                                <div class="card-content">
+                                    <p class="category">Fiat Balance</p>
+                                    <h3 class="title" id="fiatBalance">$0</h3>
+                                </div>
+                                <div class="card-footer">
+                                    <div class="stats">
+                                        <p><i class="material-icons">cloud</i> <a href="https://coinmarketcap.com/currencies/zclassic/" target="blank">CoinMarketCap.com</a></p>
+										<p><i class="material-icons">attach_money</i>USD Price: <span id="USDPrice">$0</span></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-md-4 col-sm-4">
+                            <div class="card card-stats">
+                                <div class="card-header" data-background-color="red">
+                                    <i class="material-icons">cached</i>
+                                </div>
+                                <div class="card-content">
+                                    <p class="category">Connections</p>
+                                    <h3 class="title" id="connectionsValue">0</h3>
+                                </div>
+                                <div class="card-footer">
+                                    <div class="stats">
+                                        <p><i class="fa fa-bolt"></i> Sync Status: <span id="syncStatusLabel"><span id="syncStatusValue">0%</span></span></span></p>
+										<p><i class="fa fa-cube"></i> Block Height: <span id="syncBlockHeight">0</span></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+					<div class="row">
+						<div class="col-md-12">
+						<!-- Content Wrapper -->
+		<div id="wrapper">
+			<section id="dashboardPage" class="content-wrapper">
+				<div class="inner">
+				<div class="card">
+                                <div class="card-header" data-background-color="orange">
+                                    <h4 class="title">Transactions</h4>
+                                </div>
+                                <div class="card-content table-responsive">
+					<div id="transactionTransparentSpan"></div>
+                    <div id="transactionPrivateSpan"></div>
+					</div>
+					</div>
+				</div>
+			</section>
+			<section id="memoPage" class="content-wrapper">
+			<div class="inner">
+							<div class="card">
+                                <div class="card-header" data-background-color="orange">
+                                    <h4 class="title">Memos</h4>
+                                </div>
+                                <div class="card-content table-responsive">
+					<div id="memoPageinner"></div>
+					</div>
+					</div>
+					</div>
+			</section>
+			<section id="sendPrivatePage" class="content-wrapper">
+				<div class="inner">
+					<form>
+                        <div class="form-group">
+                            <label for="privateFromField">From</label><select class="form-control" id="privateFromSelect" title="privateFromSelect"></select>
+                            <label for="privateSendToField">Send To</label><input class="form-control" type="text" id="privateSendToValue" title="privateSendToValue"/>
+                            <label for="privateAmountField">Amount <span>(Fee 0.0001)</span></label><input class="form-control" placeholder="0.0001" type="number" id="privateAmountValue" title="privateAmountValue"/>
+                            <label for="privateMemoField">Encrypted Memo <span>(optional)</span></label><input class="form-control" type="text" id="privateMemoValue" title="privateMemoValue"/>
+                        </div>
+                        <div class="form-group">
+                            <button type="button" class="btn btn-primary btn-sm" id="privateSendButton" onclick="sendPrivateTransaction()">Send</button>
+                            <button type="button" class="btn btn-primary btn-sm" id="privateResetButton" onclick="privateReset()">Reset</button>
                         </div>
 						
                     </form>
 				</div>
 			</section>
-			<section id="receivePage" class="wrapper">
+			<section id="addressesPage" class="content-wrapper">
 				<div class="inner">
-					<form class="w3-container w3-margin-top w3-medium">
-                        <div class="w3-container">
-                            <label id="receivingAddressField">Receiving Address</label><input class="w3-input w3-round" type="text" id="receivingAddressValue" title="receivingAddressValue"/>
-                            <!--<label id="descriptionField">Description</label><input class="w3-input w3-round" type="text" id="descriptionValue" title="descriptionValue"/>
-                            <label id="requestedAmountField">Requested Amount</label><input class="w3-input w3-round" type="number" id="requestedAmountValue" title="requestedAmountValue"/>-->
-                        </div>
-                        <div class="w3-container w3-center w3-margin-top">
-                            <button type="button" id="newTransparentAddress" onclick="getNewTransparentAddress()">New Transparent Address</button>
-                            <button type="button" id="newPrivateAddress" onclick="getNewPrivateAddress()">New Private Address</button>
-                        </div>
-                    </form>
+				<div class="row">
+				<div class="card">
+                                <div class="card-header" data-background-color="orange">
+                                    <h4 class="title">Transparent Addresses</h4>
+                                </div>
+                                <div class="card-content table-responsive">
+					<div id="addressTransparentSpan" style="text-align:left"></div>
+					</div>
+					</div>
 				</div>
-			</section>
-			<section id="addressesPage" class="wrapper">
-				<div class="inner">
-					<span id="addressTransparentSpan"></span>
-                    <span id="addressPrivateSpan"></span>
-					<button type="button" id="getPrivateKey" onclick="getPrivateKey()">Save Private Key</button>
-				</div>
+				<div class="row">
+								<div class="card">
+                                <div class="card-header" data-background-color="orange">
+                                    <h4 class="title">Private Addresses</h4>
+                                </div>
+                                <div class="card-content table-responsive">
+					<div id="addressPrivateSpan" style="text-align:left"></div>
+					</div>
+					</div>
+					</div>
+					<button type="button" class="btn btn-sm btn-primary" id="getPrivateKey" onclick="getPrivateKey()">Save Private Key</button>
+
+</div>
 			</section>
 		</div>
-		<footer id="footer">
-			<span class="w3-small" id="statusBar">Current Balance: <span class="w3-small" id="currentBalanceValue"></span> <span class="w3-small coin"></span>
-                    &nbsp;(Transparent: <span class="w3-small" id="transparentBalanceValue"></span> <span class="w3-small coin"></span> / Private: <span class="w3-small" id="privateBalanceValue"></span> <span class="w3-small coin"></span>)
-                    &nbsp;<span class="w3-small w3-right-align" id="connectionsField">| Connections: <span class="w3-small" id="connectionsValue"></span></span>
-                    &nbsp;| <span class="w3-small" id="syncStatusLabel">Sync Status: <span class="w3-small" id="syncStatusValue"></span>%</span></span>
-		</footer>
+					</div>
+                 
+                </div>
+            </div>
+        </div>
+    </div>
   </body>
-  
+
+
   <script>
+  
 	function launchZclassicOrg() {
 		var shell = require('electron').shell;
 		event.preventDefault();
 		shell.openExternal('http://zclassic.org/');
     }
-	
+
 	const renderer = require('./renderer.js');
 
       function openPage(pageName) {
           if (document.getElementById("alertSpan").innerHTML.length < 2) {
               let i;
-              let x = document.getElementsByClassName("wrapper");
+              let x = document.getElementsByClassName("content-wrapper");
               for (i = 0; i < x.length; i++) {
                   x[i].style.display = "none";
               }
               document.getElementById(pageName).style.display = "flex";
           } else {
-              setActiveNav(document.getElementById("welcomePage"));
+              setActiveNav(document.getElementById("dashboardTab"));
           }
       }
+	  
+
+
+	  
       function setActiveNav(element) {
           for (let i = 0; i < document.getElementsByClassName('navLink').length; i++) {
               document.getElementsByClassName('navLink')[i].parentNode.className = '';
@@ -175,12 +288,63 @@
           document.getElementById("privateAmountValue").value = "";
           document.getElementById("privateMemoValue").value = "";
       }
+	  
+	  function copyAddress(address){
+	  var addressType = "transparent";
+	  var aux = document.createElement("input");
+		aux.setAttribute("value", address);
+		document.body.appendChild(aux);
+		aux.select();
+		document.execCommand("copy");
+		document.body.removeChild(aux);
+		
+		if(address.startsWith("z")){
+			addressType = "private";
+		}
+		
+		$.notify({
+	icon: 'fa fa-clipboard',
+	message: "Your " + addressType + " address has been copied to clipboard:<br/><b>" + address + "</b>"
+	},{
+	allow_dismiss: false,
+	type: 'warning'
+});
+	
+	
+	  }
+	  
       function getNewTransparentAddress() {
-          document.getElementById("receivingAddressValue").value = renderer.generateQuerySync('getnewaddress', []).result;
+          var newTransparentAddress = renderer.generateQuerySync('getnewaddress', []).result;
+		  		  var aux = document.createElement("input");
+		aux.setAttribute("value", newTransparentAddress);
+		document.body.appendChild(aux);
+		aux.select();
+		document.execCommand("copy");
+		document.body.removeChild(aux);
+				$.notify({
+	icon: 'fa fa-clipboard',
+	message: "New transparent address has been copied to clipboard: <br/>" + newTransparentAddress
+	},{
+		allow_dismiss: false,
+
+	type: 'warning'
+});
       }
       function getNewPrivateAddress() {
-          document.getElementById("receivingAddressValue").value = renderer.generateQuerySync('z_getnewaddress', []).result;
-      }
+          var newPrivateAddress = renderer.generateQuerySync('z_getnewaddress', []).result;
+		  var aux = document.createElement("input");
+		aux.setAttribute("value", newPrivateAddress);
+		document.body.appendChild(aux);
+		aux.select();
+		document.execCommand("copy");
+		document.body.removeChild(aux);
+				$.notify({
+	icon: 'fa fa-clipboard',
+	message: "New private address has been copied to clipboard: <br/>" + newPrivateAddress
+	},{
+		allow_dismiss: false,
+	type: 'warning'
+});      }
 	function getPrivateKey() {
 	    const {dialog} = require("electron").remote;
 		const fs = require('fs');
@@ -233,9 +397,20 @@
           if (document.getElementById("privateMemoValue").value.length === 0) {
               let arg = renderer.generateQuerySync('z_sendmany', [from, [{'address': address, 'amount': amount}]]);
 			  if (arg.result === null) {
-				alert(arg.error.message);
+			  				$.notify({
+			message: arg.error.message
+				},{
+			allow_dismiss: false,
+			type: 'danger'
+			}); 
 			  } else {
-				window.alert("Successfully transmitted transaction.\n\nTXID: " + arg.result);
+			  				$.notify({
+	icon: 'fa fa-exchange',
+	message: "Successfully transmitted transaction.\n\nTXID: " + arg.result
+	},{
+		allow_dismiss: false,
+	type: 'warning'
+});
 				document.getElementById("privateResetButton").click();
 			  }
           }
@@ -243,16 +418,80 @@
               let memo = stringToHex(document.getElementById("privateMemoValue").value);
               renderer.generateQuery('z_sendmany', [from, [{'address': address, 'amount': amount, 'memo': memo}]]);
 			  if (arg.result === null) {
-				alert(arg.error.message);
+			  				$.notify({
+			message: arg.error.message
+	},{
+		allow_dismiss: false,
+		type: 'danger'
+}); 
 			  } else {
-				alert("Successfully transmitted transaction.\n\nTXID: " + arg.result);
+			  $.notify({
+	icon: 'fa fa-exchange',
+	message: "Successfully transmitted transaction.\n\nTXID: " + arg.result
+	},{
+		allow_dismiss: false,
+	type: 'warning'
+});
 				document.getElementById("privateResetButton").click();
 			  }
           }
           
       }
 
-      // set default tab
-      document.getElementById("welcomePage").click();
+
+	  function openTX(txid){
+		var shell = require('electron').shell;
+		event.preventDefault();
+		shell.openExternal("http://explorer.zclmine.pro/tx/" + txid);
+}
+
+	  
+	  function getFiatValue(){
+	
+		var xmlhttp = new XMLHttpRequest();
+var url = 'https://api.coinmarketcap.com/v1/ticker/zclassic';
+
+
+xmlhttp.onreadystatechange = function() {
+if (this.readyState == 4 && this.status == 200) {
+    var myArr = JSON.parse(this.responseText);
+	var usd = myArr[0].price_usd;
+		var coinBalance = document.getElementById("currentBalanceValue").innerHTML;
+		
+	    document.getElementById("USDPrice").innerHTML = "$" + parseFloat(usd).toFixed(2);
+		document.getElementById("fiatBalance").innerHTML = "$" + (usd * coinBalance).toFixed(2);
+		
+    } else {
+	
+			    document.getElementById("USDPrice").innerHTML = "$0";
+		document.getElementById("fiatBalance").innerHTML = "$0";
+	
+	}
+};
+
+xmlhttp.open("GET", url, true);
+xmlhttp.send();
+
+}
+
+getFiatValue();
+setInterval(getFiatValue, 30000);
+
   </script>
+  <!-- Insert this line above script imports  -->
+<script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+       <script src="assets/js/jquery-3.2.1.min.js"></script>
+	  <script type="text/javascript" src="assets/js/datatables.min.js"></script>
+	  <script type="text/javascript" src="assets/js/bootstrap-notify.min.js"></script>
+	  <script>
+	  	  //Open Home
+	  $( document ).ready(function() {
+
+	  		openPage("dashboardPage");
+			
+			});</script>
+<!-- Insert this line after script imports -->
+<script>if (window.module) module = window.module;</script>
+
+
 </html>

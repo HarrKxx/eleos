@@ -19,6 +19,8 @@ function hexToString(s) {
     return str;
 }
 
+
+
 function generateQuery(method, params) {
     let jsonObject;
     jsonObject = {"jsonrpc": "1.0", "id": method, "method": method, "params": params};
@@ -32,29 +34,21 @@ function generateQuerySync(method, params) {
     return ipcRenderer.sendSync("jsonQuery-request-sync", jsonObject);
 }
 
-function showTxDetails(txid) {
-    let res = generateQuerySync("gettransaction", [txid]);
+function format (txid) {
+	let res = generateQuerySync("gettransaction", [txid]);
     let datetime = new Date(res.result.time * 1000);
     datetime = datetime.toLocaleTimeString() + " - " + datetime.toLocaleDateString();
     let category = (res.result.amount < 0.0) ? "send" : "receive";
     let obj = {
-        amount: res.result.amount,
         blockhash: res.result.blockhash,
-        category: category,
-        confirmations: res.result.confirmations,
-        fee: res.result.fee,
-        txid: res.result.txid,
-        time: datetime
+        txid: res.result.txid
     };
-    let alertText = `Amount: ${obj.amount}\n` +
-        `Blockhash: ${obj.blockhash}\n` +
-        `Confirmations: ${obj.confirmations}\n` +
-        `Fee: ${obj.fee}\n` +
-        `Time: ${obj.time}\n` +
-        `TXID: ${obj.txid}\n` +
-        `TXID automatically copied to clipboard`;
-    clipboard.writeText(obj.txid);
-    window.alert(alertText);
+	
+    // `d` is the original data object for the row
+    return '<table cellpadding="5" cellspacing="0" border="0" style="width:100%; text-align:left;">'+
+        '<tr><th>Transaction ID <a href="#" target="_blank" onclick="openTX(\''+obj.txid+'\'); return false;"> (View TX)</a></th></tr>' +
+            '<tr><td>' + obj.txid + '</td>' +
+        '</tr><tr><th>Blockhash</th></tr><tr><td>' + obj.blockhash + '</td></tr></table>';
 }
 
 function generateMemoTable(memos) {
@@ -65,25 +59,142 @@ function generateMemoTable(memos) {
         }
         return b.time - a.time;
     });
+	
+		var findMemoTable = $("#memoTable");
+
+	if(!findMemoTable[0]){
+	var table = document.createElement('table');
+	var tableHead = table.createTHead();
+	var th = tableHead.insertRow(-1);
+
+	
+		let heading = new Array();
+		heading[0] = ""
+		heading[1] = "Amount";
+	heading[2] = "Address";
+	heading[3] = "Memo";
+	heading[4] = "Time";
+	
+		let tableBody = table.createTBody();
+
+	  // Insert cells into the header row.
+	
+  for (let i=0; i<heading.length; i++)
+	{
+		let thCell = th.insertCell(-1);
+		thCell.align = "center";
+		thCell.style.fontWeight = "bold";
+		thCell.innerHTML = heading[i];
+	}
+	
     for (let i = 0; i < localMemos.length; i++) {
-        localMemos[i].details = '<a href="javascript:void(0)" onclick="renderer.showTxDetails(\'' + localMemos[i].txid + '\')">click</a>';
-        let datetime = new Date(localMemos[i].time * 1000);
-        localMemos[i].time = datetime.toLocaleTimeString() + " - " + datetime.toLocaleDateString();
-        delete localMemos[i].txid;
+					if(localMemos[i].amount == ""){
+						continue;
+					}
+					var getProp = "";
+					var tr = tableBody.insertRow(-1);
+					tr.id = localMemos[i].txid;
+									for(let x = 0; x < heading.length; x++){
+
+							let td = tr.insertCell(-1);
+							if(heading[x] != ""){
+								getProp = heading[x].toLowerCase();
+							} 
+							
+							if(heading[x] != "Time" && heading[x] != ""){
+							td.innerHTML = localMemos[i][getProp];
+							}  else if(heading[x] ==  "Time") {
+								let datetime = new Date(localMemos[i].time * 1000);
+								localMemos[i].time = datetime;
+								td.innerHTML = datetime.toLocaleDateString() + " - " + datetime.toLocaleTimeString();
+							} else {
+								td.className = "details-control";
+							}
+									}
     }
     // build empty table if no results
     if (localMemos.length < 1) {
         localMemos[0] = {"amount": "", "address": "", "memo": "", "time": "", "details": ""};
     }
-    let tableElement = tableify(localMemos);
-    let div = document.createElement("div");
-    div.innerHTML = tableElement;
-    div.firstElementChild.className += " w3-table-all w3-tiny";
-    document.getElementById("memoPageinner").innerHTML = div.innerHTML;
+			table.id = "memoTable";
+	    	table.className += "table table-hover";
+			table.width = "100%";
+
+	  document.getElementById("memoPageinner").innerHTML = table.outerHTML;
+	  
+	  $(document).ready(function() {
+    $('#memoTable').DataTable( {
+        "pageLength": 5,
+		"searching": false,
+		"bLengthChange": false,
+		"ordering": false
+    } );
+	} );
+	
+	    // Add event listener for opening and closing details
+		$(document).ready(function () {
+    $('#transactionsTable tbody').on('click', 'td.details-control', function () {
+		var getTable = $('#memoTable').DataTable();
+        var tr = $(this).closest('tr');
+        var row = getTable.row(tr);
+ 
+        if ( row.child.isShown() ) {
+            // This row is already open - close it
+            row.child.hide();
+            tr.removeClass('shown');
+        }
+        else {
+            // Open this row
+            row.child( format(tr[0].id)).show();
+            tr.addClass('shown');
+        }
+    } );
+		});
+	} else {
+		
+
+			
+
+		
+		
+	}
 }
 
-function generateHistoryTable(txs, privTxs) {
+
+
+function generateHistoryTable(txs, privTxs, override) {
+	
+	var findTransactionTable = $("#transactionsTable");
+	
+	if(!findTransactionTable[0] || override == true){
+    var table = document.createElement('table');
+	var tableHead = table.createTHead();
+	var th = tableHead.insertRow(-1);
+
+	
+		let heading = new Array();
+		heading[0] = "";
+	heading[1] = "Category";
+	heading[2] = "Amount";
+	heading[3] = "Address";
+	heading[4] = "Confirmations";
+	heading[5] = "Time";
+	
+	  // Insert cells into the header row.
+	
+  for (let i=0; i<heading.length; i++)
+	{
+		let thCell = th.insertCell(-1);
+		thCell.align = "center";
+		thCell.style.fontWeight = "bold";
+		thCell.innerHTML = heading[i];
+	}
+
+	let tableBody = table.createTBody();
+	
     let combinedTxs = [].concat(txs, privTxs);
+	var totalTxs = combinedTxs.length - 1;
+	localStorage.zclLastTX =  combinedTxs[totalTxs].txid;
     combinedTxs.sort(function (a, b) {
         if (b.time === a.time) {
             return b.address - a.address;
@@ -103,12 +214,25 @@ function generateHistoryTable(txs, privTxs) {
                 memo: hexToString(combinedTxs[i].memo),
                 time: combinedTxs[i].time
             });
-        }
-        let datetime = new Date(combinedTxs[i].time * 1000);
-        combinedTxs[i].time = datetime.toLocaleTimeString() + " - " + datetime.toLocaleDateString();
-        combinedTxs[i].details = '<a href="javascript:void(0)" onclick="renderer.showTxDetails(\'' + combinedTxs[i].txid + '\')">click</a>';
-        delete combinedTxs[i].txid;
-        delete combinedTxs[i].memo;
+        } else {
+			
+					var tr = tableBody.insertRow(-1);
+					tr.id = combinedTxs[i].txid;
+				for(let x = 0; x < heading.length; x++){
+							let td = tr.insertCell(-1);
+							let getProp = heading[x].toLowerCase();
+							if(heading[x] != "Time" && heading[x] != ""){
+							td.innerHTML = combinedTxs[i][getProp];
+							}  else if(heading[x] ==  "Time") {
+								let datetime = new Date(combinedTxs[i].time * 1000);
+								combinedTxs[i].time = datetime;
+								td.innerHTML = datetime.toLocaleDateString() + " - " + datetime.toLocaleTimeString();
+							} else {
+								td.className = "details-control";
+							}
+						}
+
+		}
     }
     // build empty table if no results
     if (combinedTxs.length < 1) {
@@ -121,22 +245,66 @@ function generateHistoryTable(txs, privTxs) {
             "details": ""
         };
     }
-    let tableElement = tableify(combinedTxs);
-    let div = document.createElement("div");
-    div.innerHTML = tableElement;
-    div.firstElementChild.className += "w3-table-all w3-tiny";
-    for (let i = 0; i < div.getElementsByClassName("number").length; i++) {
-        div.getElementsByClassName("number")[i].className += " w3-right";
-    }
-    document.getElementById("transactionTransparentSpan").innerHTML = div.innerHTML;
+			table.id = "transactionsTable";
+	    	table.className += "table table-hover";
+			table.width = "100%";
+
+	  document.getElementById("transactionTransparentSpan").innerHTML = table.outerHTML;
+	  
+	  $(document).ready(function() {
+    $('#transactionsTable').DataTable( {
+        "pageLength": 5,
+		"searching": false,
+		"bLengthChange": false,
+		"ordering": false
+    } );
+	} );
+	
+	    // Add event listener for opening and closing details
+		$(document).ready(function () {
+
+    $('#transactionsTable tbody').on('click', 'td.details-control', function () {
+		var getTable = $('#transactionsTable').DataTable();
+        var tr = $(this).closest('tr');
+        var row = getTable.row(tr);
+ 
+        if ( row.child.isShown() ) {
+            // This row is already open - close it
+            row.child.hide();
+            tr.removeClass('shown');
+        }
+        else {
+            // Open this row
+            row.child( format(tr[0].id)).show();
+            tr.addClass('shown');
+        }
+    } );
+		});	  
+
+} else {
+
+		    var combinedTxs = [].concat(txs, privTxs);
+			var getLastTX = generateQuerySync("gettransaction", [localStorage.zclLastTX]);
+			var result = $.grep(combinedTxs, function(e){ return e.time > getLastTX.result.time})
+			if(result.length > 0){
+					generateHistoryTable(txs, privTxs, true);
+			}
+	
 }
+}
+
+
 
 ipcRenderer.on("jsonQuery-reply", (event, arg) => {
     if (arg.error && arg.error.code === -28) {
-        document.getElementById("alertSpan").innerHTML = '<h4>' + arg.error.message + '</h4>';
+        document.getElementById("alertSpan").innerHTML = '<i class="fa fa-refresh fa-spin"></i> <h4>' + arg.error.message + '</h4>';
     }
     else {
         document.getElementById("alertSpan").innerHTML = "";
+    }
+	
+		    if (arg.id === "getinfo" && arg.result) {
+        document.getElementById("syncBlockHeight").innerHTML = arg.result.blocks;
     }
 
     if (arg.id === "getnetworkinfo" && arg.result) {
@@ -148,13 +316,17 @@ ipcRenderer.on("jsonQuery-reply", (event, arg) => {
 		if(isNaN(status))
 			status = 0;
 		
-		document.getElementById("syncStatusValue").innerHTML = status;
+		document.getElementById("syncStatusValue").innerHTML = status + "%";
 		
-        if (status < 100) {
-            document.getElementById("syncStatusLabel").style.backgroundColor = "black";
-        }
+        if (status < 25) {
+            document.getElementById("syncStatusLabel").style.color = "red";
+        } else if (status > 25 && status < 75){
+			 document.getElementById("syncStatusLabel").style.color = "orange";
+		}
         else {
-            document.getElementById("syncStatusLabel").style.backgroundColor = "";
+            document.getElementById("syncStatusLabel").style.color = "green";
+			document.getElementById("syncStatusLabel").style.fontWeight = "bold";
+
         }
     }
     else if (arg.id === "z_gettotalbalance" && arg.result) {
@@ -184,7 +356,7 @@ ipcRenderer.on("jsonQuery-reply", (event, arg) => {
         let ctr = 0;
         for (let i = 0; i < arg.result.length; i++) {
             for (let n = 0; n < arg.result[i].length; n++) {
-                table[ctr] = {"transparent address": arg.result[i][n][0], "amount": arg.result[i][n][1]};
+                table[ctr] = {'Transparent Address <a href="#" data-toggle="tooltip" data-placement="top" title="New Transparent Address" onclick="getNewTransparentAddress()">&nbsp;<i class="fa fa-plus-circle" style="color:green"></i></a>': arg.result[i][n][0] + '&nbsp;<a href="#" title="Copy Address To Clipboard" onclick="copyAddress(\'' + arg.result[i][n][0] + '\')"><i class="fa fa-clipboard" style="color:#c87035"></i></a>', "Amount": arg.result[i][n][1]};
                 ctr += 1;
                 let option = document.createElement("option");
                 option.text = arg.result[i][n][0] + " (" + arg.result[i][n][1] + ")";
@@ -209,15 +381,12 @@ ipcRenderer.on("jsonQuery-reply", (event, arg) => {
         }
         // build empty table if no results
         if (arg.result.length < 1) {
-            table[0] = {"transparent address": "No addresses with received balances found", "amount": 0};
+            table[0] = {'Transparent Address <a href="#" data-toggle="tooltip" data-placement="top" title="New Transparent Address" onclick="getNewTransparentAddress()">&nbsp;<i class="fa fa-plus-circle" style="color:green"></i></a>': "No addresses with received balances found", "amount": 0};
         }
         let tableElement = tableify(table);
         let div = document.createElement("div");
         div.innerHTML = tableElement;
-        div.firstElementChild.className += " w3-table-all w3-tiny";
-        for (let i = 0; i < div.getElementsByClassName("number").length; i++) {
-            div.getElementsByClassName("number")[i].className += " w3-right";
-        }
+        div.firstElementChild.className += "table table-hover";
         if (document.getElementById("addressTransparentSpan").innerHTML !== div.innerHTML) {
             document.getElementById("addressTransparentSpan").innerHTML = div.innerHTML;
         }
@@ -227,7 +396,7 @@ ipcRenderer.on("jsonQuery-reply", (event, arg) => {
         let ctr = 0;
         for (let i = 0; i < arg.result.length; i++) {
             let res = generateQuerySync("z_getbalance", [arg.result[i], 0]);
-            table[ctr] = {"private address": arg.result[i], "amount": res.result};
+            table[ctr] = {'Private Address <a href="#" data-toggle="tooltip" data-placement="top" title="New Private Address" onclick="getNewPrivateAddress()">&nbsp;<i class="fa fa-plus-circle" style="color:green"></i></a>': arg.result[i] + '&nbsp;<a href="#" title="Copy Address To Clipboard" onclick="copyAddress(\'' + arg.result[i] + '\')"><i class="fa fa-clipboard" style="color:#c87035"></i></a>', "amount": res.result};
             ctr += 1;
             if (res.result > 0) {
                 let option = document.createElement("option");
@@ -247,15 +416,12 @@ ipcRenderer.on("jsonQuery-reply", (event, arg) => {
         }
         // build empty table if no results
         if (arg.result.length < 1) {
-            table[0] = {"privateaddress": "No addresses with received balances found", "amount": 0};
+            table[0] = {'Private Address <a href="#" data-toggle="tooltip" data-placement="top" title="New Private Address" onclick="getNewPrivateAddress()"><i class="fa fa-plus-circle" style="color:green"></i></a>': "No addresses with received balances found", "amount": 0};
         }
         let tableElement = tableify(table);
         let div = document.createElement("div");
         div.innerHTML = tableElement;
-        div.firstElementChild.className += " w3-table-all w3-tiny";
-        for (let i = 0; i < div.getElementsByClassName("number").length; i++) {
-            div.getElementsByClassName("number")[i].className += " w3-right";
-        }
+        div.firstElementChild.className += "table table-hover";
         if (document.getElementById("addressPrivateSpan").innerHTML !== div.innerHTML) {
             document.getElementById("addressPrivateSpan").innerHTML = div.innerHTML;
         }
@@ -316,7 +482,7 @@ ipcRenderer.on("coin-reply", (event, arg) => {
 
 ipcRenderer.on("params-pending", (event, arg) => {
     if (arg.percent < 1) {
-        document.getElementById("alertSpan").innerHTML = '<h4 style="text-align: center;">Downloading proving and verification keys</h4>' +
+        document.getElementById("alertSpan").innerHTML = '<i class="fa fa-refresh fa-spin"></i> <h4 style="text-align: center;">Downloading proving and verification keys</h4>' +
             '<h4 style="text-align: center;">' + (arg.name.substr(arg.name.lastIndexOf('/') + 1)) + '</h4>' +
             '<h4 style="text-align: center;">' + (arg.percent * 100).toFixed(2) + '%</h4>';
     }
@@ -327,7 +493,7 @@ ipcRenderer.on("params-pending", (event, arg) => {
 
 ipcRenderer.on("params-complete", (event, arg) => {
     if (arg === false) {
-        document.getElementById("alertSpan").innerHTML = '<h3 style="text-align: center;">Initializing</h3>';
+        document.getElementById("alertSpan").innerHTML = '<i class="fa fa-refresh fa-spin"></i> <h3 style="text-align: center;">Initializing</h3>';
     }
     else {
         document.getElementById("alertSpan").innerHTML = "";
@@ -345,7 +511,7 @@ function refreshUI() {
     generateQuery("listreceivedbyaddress", [0, true]);
 
     // for historyPage
-    generateQuery("listtransactions", []);
+    generateQuery("listtransactions", ["*", 300, 0]);
 
     // for addressesPage
     generateQuery("listaddressgroupings", []);
@@ -390,7 +556,7 @@ function refreshUI() {
 
 function pollUI() {
     if (genHistory.transparent === true && genHistory.private === true) {
-        generateHistoryTable(txs, privTxs);
+		generateHistoryTable(txs, privTxs);
         txs = [];
         privTxs = [];
         genHistory.transparent = false;
@@ -399,9 +565,11 @@ function pollUI() {
     }
 }
 
+
 refreshUI();
-setInterval(refreshUI, 900);
-setInterval(pollUI, 400);
+setInterval(refreshUI, 2000);
+setInterval(pollUI, 1000);
+
 
 module.exports = {
     generateQuerySync: function (method, params) {
